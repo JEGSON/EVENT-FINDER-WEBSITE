@@ -21,10 +21,13 @@ jobs:
         include:
           - name: backend
             dockerfile: Dockerfile.api
-            suffix: api
+            name_suffix: '-api'
           - name: frontend
             dockerfile: Dockerfile.web
-            suffix: web
+            name_suffix: '-web'
+          - name: all-in-one
+            dockerfile: Dockerfile
+            name_suffix: ''
     env:
       REPO_LOWER: ${{ toLower(github.event.repository.name) }}
       TAG_LOWER: ${{ toLower(github.ref_name) }}
@@ -52,9 +55,9 @@ jobs:
           context: .
           file: ./${{ matrix.dockerfile }}
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64/v8
           tags: |
-            docker.io/${{ env.NAMESPACE_LOWER }}/${{ env.REPO_LOWER }}-${{ matrix.suffix }}:${{ env.TAG_LOWER }}
-            docker.io/${{ env.NAMESPACE_LOWER }}/${{ env.REPO_LOWER }}-${{ matrix.suffix }}:latest
+            docker.io/${{ env.NAMESPACE_LOWER }}/${{ env.REPO_LOWER }}${{ matrix.name_suffix }}:${{ env.TAG_LOWER }}
+            docker.io/${{ env.NAMESPACE_LOWER }}/${{ env.REPO_LOWER }}${{ matrix.name_suffix }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

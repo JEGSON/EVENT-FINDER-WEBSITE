@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  api:
+    image: docker.io/${NAMESPACE}/${REPO}-api:${TAG:-latest}
+    environment:
+      - EVENTFINDER_DATABASE_PATH=/data/event_finder.db
+    volumes:
+      - event-finder-data:/data
+    restart: unless-stopped
+
+  web:
+    image: docker.io/${NAMESPACE}/${REPO}-web:${TAG:-latest}
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  event-finder-data:
+

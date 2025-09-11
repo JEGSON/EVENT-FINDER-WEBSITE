@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  app:
+    image: docker.io/${NAMESPACE}/${REPO}:${TAG:-latest}
+    ports:
+      - "8000:8000" # static site
+      - "8001:8001" # FastAPI
+    volumes:
+      - event-finder-data:/data
+    restart: unless-stopped
+
+volumes:
+  event-finder-data:
+
