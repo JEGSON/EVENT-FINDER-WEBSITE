@@ -1,0 +1,11 @@
+# Ignore local data volume and databases
+data/
+*.db
+
+# Python cache and virtual envs (common local noise)
+__pycache__/
+*.py[cod]
+.venv/
+
+# Environment files
+.env
