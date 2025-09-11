@@ -1,0 +1,11 @@
+FROM nginx:alpine
+
+COPY assets /usr/share/nginx/html/assets
+COPY index.html /usr/share/nginx/html/index.html
+COPY events.html /usr/share/nginx/html/events.html
+COPY event-detail.html /usr/share/nginx/html/event-detail.html
+COPY about.html /usr/share/nginx/html/about.html
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+
