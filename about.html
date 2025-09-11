@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About — EventFinder</title>
+    <meta name="description" content="Learn about EventFinder — a fast, simple way to discover events around you." />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <div class="nav__inner container">
+          <span class="nav__logo" aria-label="Event Finder Home">EventFinder</span>
+          <button class="nav__toggle" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="nav__toggle-icon" aria-hidden="true"></span>
+            <span class="sr-only">Menu</span>
+          </button>
+          <ul id="primary-nav" class="nav__links" role="list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="about.html" aria-current="page">About</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Mobile sidebar + backdrop -->
+    <div class="sidebar-backdrop" hidden></div>
+    <aside id="mobile-menu" class="sidebar" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title" aria-hidden="true">
+      <div class="sidebar__inner">
+        <header class="sidebar__header">
+          <h2 id="mobile-menu-title">Menu</h2>
+          <button class="sidebar__close" aria-label="Close menu">&times;</button>
+        </header>
+        <nav class="sidebar__nav" aria-label="Mobile">
+          <ul role="list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="about.html" aria-current="page">About</a></li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <main id="main">
+      <section class="about" aria-labelledby="about-title">
+        <div class="about__inner container">
+          <div class="about__wrap">
+            <div class="about__media">
+              <img class="about__img" src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1600&auto=format&fit=crop" alt="Vibrant concert crowd with lights" />
+            </div>
+            <div class="about__content">
+              <h2 id="about-title">About EventFinder</h2>
+              <p>EventFinder helps you discover what matters — concerts, conferences, festivals, meetups and more — quickly and effortlessly.</p>
+              <p>Our focus is clarity and speed: powerful filters, clean cards, and responsive layouts that feel great on any device.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner container">
+        <p>&copy; <span id="year">2025</span> EventFinder. All rights reserved.</p>
+        <ul class="site-footer__social" role="list" aria-label="Social media">
+          <li><a href="#" aria-label="Follow on Twitter">Twitter</a></li>
+          <li><a href="#" aria-label="Follow on Facebook">Facebook</a></li>
+          <li><a href="#" aria-label="Follow on Instagram">Instagram</a></li>
+          <li><a href="#" aria-label="Follow on LinkedIn">LinkedIn</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <script>
+      // Year
+      (function () { var el = document.getElementById('year'); if (el) el.textContent = new Date().getFullYear(); })();
+
+      // Mobile nav toggle
+      (function () {
+        var body = document.body;
+        var toggle = document.querySelector('.nav__toggle');
+        var sidebar = document.getElementById('mobile-menu');
+        var closeBtn = document.querySelector('.sidebar__close');
+        var backdrop = document.querySelector('.sidebar-backdrop');
+        if (!toggle || !sidebar || !backdrop) return;
+        function openSidebar() { body.setAttribute('data-sidebar', 'true'); toggle.setAttribute('aria-expanded', 'true'); sidebar.setAttribute('aria-hidden', 'false'); backdrop.hidden = false; }
+        function closeSidebar() { body.removeAttribute('data-sidebar'); toggle.setAttribute('aria-expanded', 'false'); sidebar.setAttribute('aria-hidden', 'true'); backdrop.hidden = true; }
+        toggle.addEventListener('click', function () { var isOpen = body.getAttribute('data-sidebar') === 'true'; if (isOpen) closeSidebar(); else openSidebar(); });
+        if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+        backdrop.addEventListener('click', closeSidebar);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSidebar(); });
+      })();
+    </script>
+  </body>
+  </html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Event Details — Event Finder</title>
+    <meta name="description" content="Event details" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <div class="nav__inner container">
+          <span class="nav__logo" aria-label="Event Finder Home">EventFinder</span>
+          <ul class="nav__links" role="list">
+            <li><a href="events.html">Events</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main" class="container" style="padding-block: 2rem;">
+      <article id="event-detail" class="event-card" aria-live="polite">
+        <header class="event-card__header">
+          <h1 id="title" class="event-card__title">Loading…</h1>
+        </header>
+        <dl class="event-card__meta">
+          <div>
+            <dt>Date</dt>
+            <dd><time id="date" datetime=""></time></dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd id="location"></dd>
+          </div>
+          <div>
+            <dt>Category</dt>
+            <dd><span class="badge" id="category"></span></dd>
+          </div>
+        </dl>
+        <p class="event-card__desc" id="description"></p>
+        <div class="event-card__actions">
+          <a class="button button--secondary" href="index.html#events">← Back to events</a>
+          <button id="edit-btn" class="button">Edit</button>
+          <button id="delete-btn" class="button button--ghost">Delete</button>
+        </div>
+        <form id="edit-form" class="search__form" style="display:none; margin-top:1rem;">
+          <fieldset class="search__fieldset">
+            <legend>Edit event</legend>
+            <div class="form-row">
+              <label for="e-title">Title</label>
+              <input type="text" id="e-title" name="title" maxlength="200" />
+            </div>
+            <div class="form-row">
+              <label for="e-location">Location</label>
+              <input type="text" id="e-location" name="location" maxlength="200" />
+            </div>
+            <div class="form-row">
+              <label for="e-date">Date</label>
+              <input type="date" id="e-date" name="date" />
+            </div>
+            <div class="form-row">
+              <label for="e-category">Category</label>
+              <select id="e-category" name="category">
+                <option value="">Select category</option>
+                <option value="music">Music</option>
+                <option value="tech">Tech</option>
+                <option value="sports">Sports</option>
+                <option value="arts">Arts</option>
+                <option value="business">Business</option>
+                <option value="community">Community</option>
+              </select>
+            </div>
+            <div class="form-row" style="grid-column: 1 / -1;">
+              <label for="e-description">Description</label>
+              <input type="text" id="e-description" name="description" maxlength="2000" />
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="button button--primary">Save</button>
+              <button type="button" id="cancel-edit" class="button button--secondary">Cancel</button>
+            </div>
+          </fieldset>
+        </form>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner container">
+        <p>&copy; <span id="year">2025</span> EventFinder. All rights reserved.</p>
+        <ul class="site-footer__social" role="list" aria-label="Social media">
+          <li><a href="#" aria-label="Follow on Twitter">Twitter</a></li>
+          <li><a href="#" aria-label="Follow on Facebook">Facebook</a></li>
+          <li><a href="#" aria-label="Follow on Instagram">Instagram</a></li>
+          <li><a href="#" aria-label="Follow on LinkedIn">LinkedIn</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <script>
+      (function(){
+        var host = window.location.hostname; if (host === 'localhost') host = '127.0.0.1';
+        var API_BASE = window.location.protocol + '//' + host + ':8001/api';
+        function qs(name){ return new URLSearchParams(location.search).get(name); }
+        function setText(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt||''; }
+        function setBadge(id, txt){ var el=document.getElementById(id); if(!el) return; el.textContent=txt||''; var c=(txt||'').toLowerCase(); el.className='badge'+(c==='tech'?' badge--tech':c==='music'?' badge--music':c==='sports'?' badge--sports':c==='business'?' badge--business':''); }
+        function fillEdit(evt){
+          document.getElementById('e-title').value = evt.title || '';
+          document.getElementById('e-location').value = evt.location || '';
+          document.getElementById('e-date').value = (evt.date || '').slice(0,10);
+          document.getElementById('e-description').value = evt.description || '';
+          var sel = document.getElementById('e-category');
+          if(sel){ sel.value = (evt.category || '').toLowerCase(); }
+        }
+        function toggleEdit(show){ document.getElementById('edit-form').style.display = show ? 'block' : 'none'; }
+
+        (function(){ var y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear(); })();
+        var id = qs('id');
+        if(!id){ setText('title','Event not found'); return; }
+
+        // Load categories into edit select
+        fetch(API_BASE + '/meta/categories').then(r=>r.json()).then(function(cats){
+          var sel = document.getElementById('e-category');
+          if(!sel) return;
+          var first = sel.querySelector('option');
+          sel.innerHTML = '';
+          if (first) sel.appendChild(first);
+          cats.forEach(function(c){ var o=document.createElement('option'); o.value=c; o.textContent=c.charAt(0).toUpperCase()+c.slice(1); sel.appendChild(o); });
+        }).catch(function(){});
+
+        // Fetch event
+        fetch(API_BASE + '/events/' + encodeURIComponent(id))
+          .then(function(res){ if(!res.ok) throw new Error('Not found'); return res.json(); })
+          .then(function(evt){
+            setText('title', evt.title);
+            var d = new Date(evt.date);
+            var dateEl = document.getElementById('date');
+            if(dateEl){ dateEl.textContent = d.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'}); dateEl.setAttribute('datetime', evt.date); }
+            setText('location', evt.location);
+            setBadge('category', evt.category);
+            setText('description', evt.description || '');
+            fillEdit(evt);
+          })
+          .catch(function(){ setText('title','Event not found'); });
+
+        // Edit handlers
+        var editBtn = document.getElementById('edit-btn');
+        var cancelBtn = document.getElementById('cancel-edit');
+        var editForm = document.getElementById('edit-form');
+        var delBtn = document.getElementById('delete-btn');
+        if (editBtn) editBtn.addEventListener('click', function(){ toggleEdit(true); });
+        if (cancelBtn) cancelBtn.addEventListener('click', function(){ toggleEdit(false); });
+        if (editForm) editForm.addEventListener('submit', function(e){
+          e.preventDefault();
+          var fd = new FormData(editForm);
+          var payload = {};
+          fd.forEach(function(v,k){ if(v) payload[k]=v; });
+          fetch(API_BASE + '/events/' + encodeURIComponent(id), {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).then(function(res){ if(!res.ok) throw new Error('Update failed'); return res.json(); })
+          .then(function(evt){
+            toggleEdit(false);
+            setText('title', evt.title);
+            var d = new Date(evt.date);
+            var dateEl = document.getElementById('date');
+            if(dateEl){ dateEl.textContent = d.toLocaleDateString(undefined, {year:'numeric', month:'long', day:'numeric'}); dateEl.setAttribute('datetime', evt.date); }
+            setText('location', evt.location);
+            setBadge('category', evt.category);
+            setText('description', evt.description || '');
+          }).catch(function(err){ alert('Failed to update event.'); console.error(err); });
+        });
+
+        if (delBtn) delBtn.addEventListener('click', function(){
+          if (!confirm('Delete this event?')) return;
+          fetch(API_BASE + '/events/' + encodeURIComponent(id), { method: 'DELETE' })
+            .then(function(res){ if(res.status===204) { window.location.href = 'index.html#events'; } else { throw new Error('Delete failed'); } })
+            .catch(function(err){ alert('Failed to delete event.'); console.error(err); });
+        });
+      })();
+    </script>
+  </body>
+  </html>

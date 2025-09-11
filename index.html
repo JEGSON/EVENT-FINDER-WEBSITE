@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Event Finder — Discover Events Near You</title>
+    <meta
+      name="description"
+      content="Find and explore events by keyword, location, date, and category."
+    />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <div class="nav__inner container">
+          <span class="nav__logo" aria-label="Event Finder Home">EventFinder</span>
+          <button class="nav__toggle" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="nav__toggle-icon" aria-hidden="true"></span>
+            <span class="sr-only">Menu</span>
+          </button>
+          <ul id="primary-nav" class="nav__links" role="list">
+            <li><a href="#" aria-current="page">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Mobile sidebar + backdrop -->
+    <div class="sidebar-backdrop" hidden></div>
+    <aside id="mobile-menu" class="sidebar" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title" aria-hidden="true">
+      <div class="sidebar__inner">
+        <header class="sidebar__header">
+          <h2 id="mobile-menu-title">Menu</h2>
+          <button class="sidebar__close" aria-label="Close menu">&times;</button>
+        </header>
+        <nav class="sidebar__nav" aria-label="Mobile">
+          <ul role="list">
+            <li><a href="#">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__inner container">
+          <h1 id="hero-title">Discover Events Around You</h1>
+          <p class="hero__subtitle">
+            From meetups to concerts, find what moves you.
+          </p>
+          <p>
+            <a class="button button--primary" href="events.html">Browse Events</a>
+          </p>
+        </div>
+      </section>
+
+      <!-- Featured Highlights -->
+      <section class="events" aria-labelledby="featured-title">
+        <div class="events__inner container">
+          <h2 id="featured-title">Featured Highlights</h2>
+          <div class="events__grid">
+            <article class="event-card">
+              <h3 class="event-card__title">Lagos Street Food Market</h3>
+              <dl class="event-card__meta">
+                <div><dt>Date</dt><dd><time datetime="2025-11-02">Nov 2, 2025</time></dd></div>
+                <div><dt>Location</dt><dd>Lagos, Nigeria</dd></div>
+                <div><dt>Category</dt><dd><span class="badge badge--community">Community</span></dd></div>
+              </dl>
+              <p class="event-card__desc">Taste the best of Lagos street cuisine with live music.</p>
+            </article>
+            <article class="event-card">
+              <h3 class="event-card__title">Abuja Tech Expo</h3>
+              <dl class="event-card__meta">
+                <div><dt>Date</dt><dd><time datetime="2025-10-12">Oct 12, 2025</time></dd></div>
+                <div><dt>Location</dt><dd>Abuja, Nigeria</dd></div>
+                <div><dt>Category</dt><dd><span class="badge badge--tech">Tech</span></dd></div>
+              </dl>
+              <p class="event-card__desc">Startups showcase products, plus workshops and networking.</p>
+            </article>
+            <article class="event-card">
+              <h3 class="event-card__title">Calabar Carnival Showcase</h3>
+              <dl class="event-card__meta">
+                <div><dt>Date</dt><dd><time datetime="2025-12-20">Dec 20, 2025</time></dd></div>
+                <div><dt>Location</dt><dd>Calabar, Nigeria</dd></div>
+                <div><dt>Category</dt><dd><span class="badge badge--arts">Arts</span></dd></div>
+              </dl>
+              <p class="event-card__desc">A vibrant preview of the famous Calabar Carnival.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Events Grid -->
+      <section class="events" id="events" aria-labelledby="events-title">
+        <div class="events__inner container">
+          <h2 id="events-title">Latest Events</h2>
+          <div class="events__grid" id="events-grid"></div>
+          <nav class="pagination" id="pagination" aria-label="Events pagination">
+            <button class="button button--secondary" id="prev-page" disabled>Previous</button>
+            <span id="page-info"></span>
+            <button class="button button--secondary" id="next-page">Next</button>
+          </nav>
+        </div>
+      </section>
+
+      <!-- Additional sections -->
+
+      
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner container">
+        <p>&copy; <span id="year">2025</span> EventFinder. All rights reserved.</p>
+        <ul class="site-footer__social" role="list" aria-label="Social media">
+          <li><a href="#" aria-label="Follow on Twitter">Twitter</a></li>
+          <li><a href="#" aria-label="Follow on Facebook">Facebook</a></li>
+          <li><a href="#" aria-label="Follow on Instagram">Instagram</a></li>
+          <li><a href="#" aria-label="Follow on LinkedIn">LinkedIn</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <script>
+      // Copyright year
+      (function () { var el = document.getElementById("year"); if (el) el.textContent = new Date().getFullYear(); })();
+
+      // Mobile nav toggle
+      (function () {
+        var body = document.body;
+        var toggle = document.querySelector('.nav__toggle');
+        var sidebar = document.getElementById('mobile-menu');
+        var closeBtn = document.querySelector('.sidebar__close');
+        var backdrop = document.querySelector('.sidebar-backdrop');
+        if (!toggle || !sidebar || !backdrop) return;
+        function openSidebar() { body.setAttribute('data-sidebar', 'true'); toggle.setAttribute('aria-expanded', 'true'); sidebar.setAttribute('aria-hidden', 'false'); backdrop.hidden = false; }
+        function closeSidebar() { body.removeAttribute('data-sidebar'); toggle.setAttribute('aria-expanded', 'false'); sidebar.setAttribute('aria-hidden', 'true'); backdrop.hidden = true; }
+        toggle.addEventListener('click', function () { var isOpen = body.getAttribute('data-sidebar') === 'true'; if (isOpen) closeSidebar(); else openSidebar(); });
+        if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+        backdrop.addEventListener('click', closeSidebar);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSidebar(); });
+      })();
+
+      // Frontend integration with FastAPI backend
+      (function () {
+        // Build API base; map localhost to 127.0.0.1 to avoid IPv6 issues
+        (function(){ var host = window.location.hostname; if (host === 'localhost') host = '127.0.0.1'; window.API_BASE = window.location.protocol + '//' + host + ':8001/api'; })();
+        var API_BASE = window.API_BASE;
+
+        var searchForm = document.getElementById('search-form');
+        var grid = document.getElementById('events-grid');
+        var catSelect = document.getElementById('category');
+
+        function escapeHtml(str) { return String(str || '').replace(/[&<>\"]/g, function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]);}); }
+
+        function cardHTML(evt) {
+          var dateText = new Date(evt.date).toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: 'numeric'});
+          var catClass = 'badge';
+          var cat = (evt.category || '').toLowerCase();
+          if (cat === 'tech') catClass += ' badge--tech';
+          else if (cat === 'music') catClass += ' badge--music';
+          else if (cat === 'sports') catClass += ' badge--sports';
+          else if (cat === 'business') catClass += ' badge--business';
+          return (
+            '<article class="event-card" aria-labelledby="ev-' + evt.id + '-title">' +
+            '  <header class="event-card__header">' +
+            '    <h3 id="ev-' + evt.id + '-title" class="event-card__title">' + escapeHtml(evt.title) + '</h3>' +
+            '  </header>' +
+            '  <dl class="event-card__meta">' +
+            '    <div><dt>Date</dt><dd><time datetime="' + escapeHtml(evt.date) + '">' + dateText + '</time></dd></div>' +
+            '    <div><dt>Location</dt><dd>' + escapeHtml(evt.location) + '</dd></div>' +
+            '    <div><dt>Category</dt><dd><span class="' + catClass + '">' + escapeHtml(evt.category) + '</span></dd></div>' +
+            '  </dl>' +
+            '  <p class="event-card__desc">' + escapeHtml(evt.description || '') + '</p>' +
+            '  <p class="event-card__actions">' +
+            '    <a class="button button--ghost" href="event-detail.html?id=' + evt.id + '">View Details</a> ' +
+            '    <button class="button button--danger js-del" data-id="' + evt.id + '">Delete</button>' +
+            '  </p>' +
+            '</article>'
+          );
+        }
+
+        async function searchWithMeta(params) {
+          var qs = new URLSearchParams(params).toString();
+          var res = await fetch(API_BASE + '/events?' + qs);
+          if (!res.ok) throw new Error('Search failed');
+          var total = parseInt(res.headers.get('X-Total-Count') || '0', 10);
+          var items = await res.json();
+          return { items: items, total: total };
+        }
+
+
+        function renderEvents(list) {
+          if (!grid) return;
+          if (!list || list.length === 0) { grid.innerHTML = '<p>No events found.</p>'; return; }
+          grid.innerHTML = list.map(cardHTML).join('');
+          grid.querySelectorAll('.js-del').forEach(function(btn){
+            btn.addEventListener('click', async function(){
+              var id = btn.getAttribute('data-id');
+              if (!id) return;
+              if (!confirm('Delete this event?')) return;
+              try {
+                var res = await fetch(API_BASE + '/events/' + encodeURIComponent(id), { method: 'DELETE' });
+                if (res.status === 204) { await runSearch(); }
+                else { alert('Failed to delete event'); }
+              } catch (e) { console.error(e); alert('Failed to delete event'); }
+            });
+          });
+        }
+
+        // Pagination state and handlers
+        var state = { limit: 6, offset: 0, total: 0, params: {} };
+        var prevBtn = document.getElementById('prev-page');
+        var nextBtn = document.getElementById('next-page');
+        var pageInfo = document.getElementById('page-info');
+        function updatePagination() { var page = Math.floor(state.offset / state.limit) + 1; var pages = Math.max(1, Math.ceil(state.total / state.limit)); if (pageInfo) pageInfo.textContent = 'Page ' + page + ' of ' + pages; if (prevBtn) prevBtn.disabled = state.offset <= 0; if (nextBtn) nextBtn.disabled = state.offset + state.limit >= state.total; }
+        async function runSearch() { var p = Object.assign({}, state.params, { limit: state.limit, offset: state.offset, sort: 'created_desc' }); var result = await searchWithMeta(p); state.total = result.total; renderEvents(result.items); updatePagination(); }
+
+        if (searchForm) {
+          searchForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var form = new FormData(searchForm); var params = {}; form.forEach((v, k) => { if (v) params[k] = v; });
+            try { state.params = params; state.offset = 0; await runSearch(); location.hash = '#events'; }
+            catch (err) { console.error(err); alert('Search failed. Ensure the API is running on port 8001.'); }
+          });
+        }
+
+        // (Alphabet filter removed by request)
+
+
+        if (prevBtn) prevBtn.addEventListener('click', async function(){ if (state.offset > 0) { state.offset = Math.max(0, state.offset - state.limit); await runSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
+        if (nextBtn) nextBtn.addEventListener('click', async function(){ if (state.offset + state.limit < state.total) { state.offset += state.limit; await runSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
+
+        // Initial load
+        (async function initialLoad(){ try { state.params = {}; state.offset = 0; state.limit = 6; await runSearch(); } catch(_) { } })();
+
+        // Populate categories dynamically (non-blocking)
+        (async function loadCategories(){ try { var res = await fetch(API_BASE + '/meta/categories'); if (!res.ok) return; var cats = await res.json();
+          function fillSelect(sel, keepFirst) { if (!sel) return; var first = keepFirst ? sel.querySelector('option') : null; sel.innerHTML = ''; if (first) sel.appendChild(first); cats.forEach(function(c){ var opt = document.createElement('option'); opt.value = c; opt.textContent = c.charAt(0).toUpperCase() + c.slice(1); sel.appendChild(opt); }); }
+          fillSelect(catSelect, true);
+        } catch(_){} })();
+      })();
+    </script>
+  </body>
+  </html>

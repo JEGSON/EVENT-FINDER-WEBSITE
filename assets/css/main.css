@@ -1,0 +1,9 @@
+/* Main CSS entry — composes layered modules for scalability */
+@layer base, layout, components, theme, utilities;
+
+@import url('base.css');
+@import url('layout.css');
+@import url('components.css');
+@import url('theme.css');
+@import url('utilities.css');
+
