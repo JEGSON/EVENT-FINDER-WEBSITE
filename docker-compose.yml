@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: event-finder-api:local
+    environment:
+      - EVENTFINDER_DATABASE_PATH=/data/event_finder.db
+    volumes:
+      - event-finder-data:/data
+    ports:
+      - "8001:8001" # expose API directly (dev-friendly)
+    networks:
+      - appnet
+
+  web:
+    image: nginx:alpine
+    depends_on:
+      - api
+    ports:
+      - "8080:80" # single entrypoint via NGINX
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./events.html:/usr/share/nginx/html/events.html:ro
+      - ./event-detail.html:/usr/share/nginx/html/event-detail.html:ro
+      - ./about.html:/usr/share/nginx/html/about.html:ro
+      - ./assets:/usr/share/nginx/html/assets:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
+
+volumes:
+  event-finder-data:
+

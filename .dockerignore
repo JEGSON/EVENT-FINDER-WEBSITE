@@ -1,0 +1,11 @@
+.venv
+__pycache__/
+*.pyc
+.git
+.gitignore
+event_finder.db
+*.log
+node_modules/
+design/
+.server.pid
+
