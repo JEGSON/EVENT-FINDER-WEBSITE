@@ -16,5 +16,21 @@ cleanup() {
 }
 trap cleanup INT TERM
 
-wait -n "$API_PID" "$WEB_PID"
+# Portable alternative to `wait -n`: poll both PIDs and exit when either dies
+while :; do
+  if ! kill -0 "$API_PID" 2>/dev/null; then
+    echo "API process exited; shutting down web" >&2
+    break
+  fi
+  if ! kill -0 "$WEB_PID" 2>/dev/null; then
+    echo "Web process exited; shutting down API" >&2
+    break
+  fi
+  sleep 1
+done
 
+cleanup
+
+# Ensure both children have fully exited
+wait "$API_PID" 2>/dev/null || true
+wait "$WEB_PID" 2>/dev/null || true
