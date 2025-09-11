@@ -7,7 +7,7 @@ from fastapi import FastAPI
 
 @pytest.mark.asyncio
 async def test_health(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on")
+    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         r = await client.get("/health")
         assert r.status_code == 200
@@ -16,7 +16,7 @@ async def test_health(app: FastAPI):
 
 @pytest.mark.asyncio
 async def test_categories(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on")
+    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         r = await client.get("/api/meta/categories")
         assert r.status_code == 200
@@ -26,7 +26,7 @@ async def test_categories(app: FastAPI):
 
 @pytest.mark.asyncio
 async def test_create_get_and_list_event(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on")
+    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         payload = {
             "title": "PyCon Meetup",
@@ -59,7 +59,7 @@ async def test_create_get_and_list_event(app: FastAPI):
 
 @pytest.mark.asyncio
 async def test_update_event_partial(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on")
+    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         # Seed an event
         payload = {
@@ -91,7 +91,7 @@ async def test_update_event_partial(app: FastAPI):
 
 @pytest.mark.asyncio
 async def test_delete_event_and_404_after(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on")
+    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         payload = {
             "title": "To Delete",
@@ -115,7 +115,7 @@ async def test_delete_event_and_404_after(app: FastAPI):
 
 @pytest.mark.asyncio
 async def test_update_delete_nonexistent_return_404(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on")
+    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         r = await client.patch("/api/events/999999", json={"title": "Nope"})
         assert r.status_code == 404

@@ -2,7 +2,7 @@ import importlib
 import os
 from pathlib import Path
 
-import pytest
+import pytest # type: ignore
 
 
 @pytest.fixture(scope="session")
