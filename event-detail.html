@@ -99,8 +99,14 @@
 
     <script>
       (function(){
-        var host = window.location.hostname; if (host === 'localhost') host = '127.0.0.1';
-        var API_BASE = window.location.protocol + '//' + host + ':8001/api';
+        // Resolve API_BASE: meta override, Render origin /api, or localhost:8001
+        if (!window.API_BASE){
+          var meta = document.querySelector('meta[name="api-base"]');
+          if (meta && meta.content){ window.API_BASE = meta.content; }
+          else if (/onrender\.com$/.test(window.location.hostname)) { window.API_BASE = window.location.origin + '/api'; }
+          else { var host = window.location.hostname; if (host === 'localhost') host = '127.0.0.1'; window.API_BASE = window.location.protocol + '//' + host + ':8001/api'; }
+        }
+        var API_BASE = window.API_BASE;
         function qs(name){ return new URLSearchParams(location.search).get(name); }
         function setText(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt||''; }
         function setBadge(id, txt){ var el=document.getElementById(id); if(!el) return; el.textContent=txt||''; var c=(txt||'').toLowerCase(); el.className='badge'+(c==='tech'?' badge--tech':c==='music'?' badge--music':c==='sports'?' badge--sports':c==='business'?' badge--business':''); }

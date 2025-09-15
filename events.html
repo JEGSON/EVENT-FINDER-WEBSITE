@@ -220,7 +220,15 @@
 
       (function () {
         // API base (map localhost to 127.0.0.1)
-        (function(){ var host = window.location.hostname; if (host === 'localhost') host = '127.0.0.1'; window.API_BASE = window.location.protocol + '//' + host + ':8001/api'; })();
+        (function(){
+          if (window.API_BASE) return;
+          var meta = document.querySelector('meta[name="api-base"]');
+          if (meta && meta.content) { window.API_BASE = meta.content; return; }
+          var host = window.location.hostname;
+          if (/onrender\.com$/.test(host)) { window.API_BASE = window.location.origin + '/api'; return; }
+          if (host === 'localhost') host = '127.0.0.1';
+          window.API_BASE = window.location.protocol + '//' + host + ':8001/api';
+        })();
         var API_BASE = window.API_BASE;
 
         var grid = document.getElementById('events-grid');
