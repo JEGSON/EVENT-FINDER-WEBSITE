@@ -61,6 +61,11 @@ def create_app() -> FastAPI:
             # Avoid leaking internals in readiness path
             raise HTTPException(status_code=503, detail="unready")
 
+    # Some platforms may probe HEAD; respond success without body
+    @app.head("/ready")
+    def ready_head() -> JSONResponse:
+        return JSONResponse(status_code=200, content=None)
+
     @app.get("/", include_in_schema=False)
     def root() -> RedirectResponse:
         """Redirect the API root to the interactive Swagger docs."""
