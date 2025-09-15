@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     backend_cors_origins: List[str] = [
         "http://localhost:8000",
         "http://127.0.0.1:8000",
+        "http://0.0.0.0:8000",
     ]
 
     # pydantic-settings v2 configuration

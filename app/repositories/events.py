@@ -50,17 +50,24 @@ def row_to_event(row: sqlite3.Row) -> EventOut:
 def insert_event(conn: sqlite3.Connection, data: EventCreate) -> EventOut:
     """Insert a new event and return the persisted record."""
     cur = conn.cursor()
-    cur.execute(
-        """
-        INSERT INTO events (title, description, location, category, date)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (data.title, data.description, data.location, data.category.value, data.date.isoformat()),
-    )
-    event_id = cur.lastrowid
-    cur.execute("SELECT * FROM events WHERE id = ?", (event_id,))
-    row = cur.fetchone()
-    return row_to_event(row)
+    try:
+        cur.execute(
+            """
+            INSERT INTO events (title, description, location, category, date)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (data.title, data.description, data.location, data.category.value, data.date.isoformat()),
+        )
+        event_id = cur.lastrowid
+        conn.commit()  # Add commit here
+        cur.execute("SELECT * FROM events WHERE id = ?", (event_id,))
+        row = cur.fetchone()
+        return row_to_event(row)
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        cur.close()
 
 
 def list_events(conn: sqlite3.Connection, q: EventQuery) -> List[EventOut]:
@@ -171,6 +178,7 @@ def update_event(conn: sqlite3.Connection, event_id: int, updates: EventUpdate) 
     data = updates.model_dump(exclude_unset=True)
     if not data:
         return get_event(conn, event_id)
+    
     fields = []
     params: List[Any] = []
     if "title" in data:
@@ -195,16 +203,30 @@ def update_event(conn: sqlite3.Connection, event_id: int, updates: EventUpdate) 
     params.append(event_id)
     sql = f"UPDATE events SET {', '.join(fields)} WHERE id = ?"
     cur = conn.cursor()
-    cur.execute(sql, params)
-    if cur.rowcount == 0:
-        return None
-    cur.execute("SELECT * FROM events WHERE id = ?", (event_id,))
-    row = cur.fetchone()
-    return row_to_event(row) if row else None
+    try:
+        cur.execute(sql, params)
+        conn.commit()  # Add commit here
+        if cur.rowcount == 0:
+            return None
+        cur.execute("SELECT * FROM events WHERE id = ?", (event_id,))
+        row = cur.fetchone()
+        return row_to_event(row) if row else None
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        cur.close()
 
 
 def delete_event(conn: sqlite3.Connection, event_id: int) -> bool:
     """Delete an event by ID. Returns True if a row was removed."""
     cur = conn.cursor()
-    cur.execute("DELETE FROM events WHERE id = ?", (event_id,))
-    return cur.rowcount > 0
+    try:
+        cur.execute("DELETE FROM events WHERE id = ?", (event_id,))
+        conn.commit()  # Add commit here - this was the main issue!
+        return cur.rowcount > 0
+    except Exception as e:
+        conn.rollback()  # Rollback on error
+        raise e
+    finally:
+        cur.close()  # Clean up cursor

@@ -5,7 +5,9 @@ scripted sessions, a FastAPI dependency for request-scoped connections, and
 database initialization (DDL and indexes).
 """
 
+import os
 import sqlite3
+import time
 from contextlib import contextmanager
 import logging
 from pathlib import Path
@@ -112,29 +114,73 @@ def _ensure_fts5(conn: sqlite3.Connection) -> None:
         raise
 
 
-def init_db() -> None:
-    """Create database file, schema, and useful indexes if missing."""
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with _connect() as conn:
-        cur = conn.cursor()
-        cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS events (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                description TEXT,
-                location TEXT NOT NULL,
-                category TEXT NOT NULL,
-                date TEXT NOT NULL,
-                created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
-            )
-            """
+def _create_schema(conn: sqlite3.Connection) -> None:
+    """Create core tables and indexes."""
+    cur = conn.cursor()
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT,
+            location TEXT NOT NULL,
+            category TEXT NOT NULL,
+            date TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
         )
-        # Helpful indexes for search and sorting
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_events_date ON events(date)")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_events_category ON events(LOWER(category))")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_events_location ON events(LOWER(location))")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at)")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_events_title ON events(LOWER(title))")
-        _ensure_fts5(conn)
-        conn.commit()
+        """
+    )
+    # Helpful indexes for search and sorting
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_events_date ON events(date)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_events_category ON events(LOWER(category))")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_events_location ON events(LOWER(location))")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_events_title ON events(LOWER(title))")
+    _ensure_fts5(conn)
+    conn.commit()
+
+
+def _integrity_ok(conn: sqlite3.Connection) -> bool:
+    """Return True if PRAGMA quick_check reports OK, else False."""
+    try:
+        cur = conn.cursor()
+        cur.execute("PRAGMA quick_check")
+        row = cur.fetchone()
+        return bool(row and str(row[0]).lower() == "ok")
+    except sqlite3.DatabaseError:
+        return False
+
+
+def init_db() -> None:
+    """Create database and schema; optionally auto-repair if corrupted.
+
+    If ``EVENTFINDER_DB_AUTOREPAIR`` is set to a truthy value ("1", "true",
+    "yes"), a corrupted SQLite file will be backed up and recreated.
+    """
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    need_repair = False
+    if DB_PATH.exists():
+        try:
+            with _connect() as c:
+                need_repair = not _integrity_ok(c)
+        except sqlite3.DatabaseError:
+            need_repair = True
+
+    if need_repair and str(os.getenv("EVENTFINDER_DB_AUTOREPAIR", "")).lower() in {"1", "true", "yes"}:
+        try:
+            backup = DB_PATH.with_name(DB_PATH.name + f".bak-{time.strftime('%Y%m%d%H%M%S')}")
+            DB_PATH.rename(backup)
+        except Exception:
+            # If we cannot rename, fall back to removing the corrupted file
+            try:
+                DB_PATH.unlink(missing_ok=True)  # type: ignore[attr-defined]
+            except Exception:
+                pass
+        with _connect() as conn:
+            _create_schema(conn)
+        return
+
+    # Normal path (no repair, or file absent): ensure schema exists
+    with _connect() as conn:
+        _create_schema(conn)

@@ -48,7 +48,7 @@
       
 
       <section class="find-create" aria-labelledby="layout-title">
-        <div class="container sheet sheet--rounded">
+        <div class="container">
           <h2 id="layout-title" class="sr-only">Find and Create Events</h2>
           <div class="page-grid">
             <!-- Left: Find Events -->
@@ -64,15 +64,15 @@
                     <input type="search" id="q" name="q" placeholder="Search events by name, keyword, or location…" autocomplete="off" />
                   </div>
                   <div class="filters filters--inline">
-                    <button type="button" id="filters-toggle" class="filters__toggle soft-input icon-input" data-icon="🗂️" aria-expanded="false" aria-controls="filters-content">Advanced Filters</button>
-                    <div class="filters__date icon-input soft-input" data-icon="📅">
+                    <button type="button" id="filters-toggle" class="filters__toggle soft-input icon-input" aria-expanded="false" aria-controls="filters-content">Advanced Filters</button>
+                    <div class="filters__date icon-input soft-input">
                       <label class="sr-only" for="date">Date</label>
                       <input type="date" id="date" name="date" />
                     </div>
                   </div>
                   <div id="filters-content" class="filters__content" hidden>
                     <div class="filters__row">
-                      <div class="filters__field icon-input" data-icon="🎭">
+                      <div class="filters__field icon-input">
                         <label for="category">Category</label>
                         <select id="category" name="category">
                           <option value="">All categories</option>
@@ -97,7 +97,7 @@
               <div class="panel__body">
                 <div class="create-grid">
                   <form id="add-form" class="stack" novalidate>
-                    <div class="float-label icon-input" data-icon="✏️">
+                    <div class="float-label">
                       <input id="add-title-input" name="title" type="text" placeholder=" " required maxlength="200" />
                       <label for="add-title-input">Event Name</label>
                     </div>
@@ -107,7 +107,7 @@
                       <label for="add-description">Description (optional)</label>
                     </div>
 
-                    <div class="icon-input" data-icon="📍">
+                    <div class="icon-input">
                       <label for="add-location">Location</label>
                       <input id="add-location" name="location" type="text" placeholder="City or venue" maxlength="200" />
                     </div>
@@ -120,11 +120,11 @@
                     </div>
 
                     <div class="form-row-two">
-                      <div class="icon-input" data-icon="📅">
+                      <div class="icon-input
                         <label for="add-start">Start (date &amp; time)</label>
                         <input id="add-start" name="start" type="datetime-local" required />
                       </div>
-                      <div class="icon-input" data-icon="📅">
+                      <div class="icon-input
                         <label for="add-end">End (optional)</label>
                         <input id="add-end" name="end" type="datetime-local" />
                       </div>
@@ -140,7 +140,6 @@
                     <div class="upload-zone" id="upload-zone">
                       <input id="add-image" name="image" type="file" accept="image/*" aria-label="Upload image" />
                       <div class="upload-zone__content">
-                        <span class="upload-zone__icon">🖼️</span>
                         <p>Drag &amp; drop image here, or click to select</p>
                       </div>
                     </div>
@@ -226,7 +225,7 @@
           if (meta && meta.content) { window.API_BASE = meta.content; return; }
           var host = window.location.hostname;
           if (/onrender\.com$/.test(host)) { window.API_BASE = window.location.origin + '/api'; return; }
-          if (host === 'localhost') host = '127.0.0.1';
+          if (host === 'localhost' || host === '0.0.0.0') host = '127.0.0.1';
           window.API_BASE = window.location.protocol + '//' + host + ':8001/api';
         })();
         var API_BASE = window.API_BASE;

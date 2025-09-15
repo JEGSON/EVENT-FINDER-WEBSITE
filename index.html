@@ -157,7 +157,7 @@
           var host = window.location.hostname;
           var isRender = /onrender\.com$/.test(host);
           if (isRender) { window.API_BASE = window.location.origin + '/api'; return; }
-          if (host === 'localhost') host = '127.0.0.1';
+          if (host === 'localhost' || host === '0.0.0.0') host = '127.0.0.1';
           window.API_BASE = window.location.protocol + '//' + host + ':8001/api';
         })();
         var API_BASE = window.API_BASE;
