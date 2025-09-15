@@ -45,65 +45,138 @@
     </aside>
 
     <main id="main">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero__inner container">
-          <h1 id="hero-title">All Events</h1>
-          <p class="hero__subtitle">Browse upcoming events.</p>
-        </div>
-      </section>
-
-      <!-- Search & Filter (moved from Home) -->
-      <section class="search" id="search" aria-labelledby="search-title">
-        <div class="search__inner container">
-          <h2 id="search-title">Search &amp; Filter</h2>
-          <form class="search__form" id="search-form" action="#" method="get" role="search">
-            <fieldset class="search__fieldset">
-              <legend>Filter events</legend>
-
-              <div class="form-row">
-                <label for="q">Keyword</label>
-                <input type="search" id="q" name="q" placeholder="e.g., tech, music, art" autocomplete="off" />
-              </div>
-
-              <div class="form-row">
-                <label for="location">Location</label>
-                <input type="text" id="location" name="location" placeholder="City or venue" />
-              </div>
-
-              <div class="form-row">
-                <label for="date">Date</label>
-                <input type="date" id="date" name="date" />
-              </div>
-
-              <div class="form-row">
-                <label for="category">Category</label>
-                <select id="category" name="category">
-                  <option value="">All categories</option>
-                  <option value="music">Music</option>
-                  <option value="tech">Tech</option>
-                  <option value="sports">Sports</option>
-                  <option value="arts">Arts</option>
-                  <option value="business">Business</option>
-                  <option value="community">Community</option>
-                </select>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="button button--primary">Search</button>
-                <button type="reset" class="button button--secondary">Clear</button>
-              </div>
-            </fieldset>
-          </form>
-        </div>
-      </section>
-
       
+
+      <section class="find-create" aria-labelledby="layout-title">
+        <div class="container sheet sheet--rounded">
+          <h2 id="layout-title" class="sr-only">Find and Create Events</h2>
+          <div class="page-grid">
+            <!-- Left: Find Events -->
+            <section class="panel glass-panel" aria-labelledby="search-title">
+              <header class="panel__header">
+                <h3 id="search-title" class="panel__title">Find Events</h3>
+                <button type="button" id="scroll-create-top" class="button button--gradient button--glow panel__action">➕ Add Event</button>
+              </header>
+              <div class="panel__body">
+                <form id="search-form" action="#" method="get" role="search" class="find-form">
+                  <div class="search-large icon-input" data-icon="🔍">
+                    <label class="sr-only" for="q">Search</label>
+                    <input type="search" id="q" name="q" placeholder="Search events by name, keyword, or location…" autocomplete="off" />
+                  </div>
+                  <div class="filters filters--inline">
+                    <button type="button" id="filters-toggle" class="filters__toggle soft-input icon-input" data-icon="🗂️" aria-expanded="false" aria-controls="filters-content">Advanced Filters</button>
+                    <div class="filters__date icon-input soft-input" data-icon="📅">
+                      <label class="sr-only" for="date">Date</label>
+                      <input type="date" id="date" name="date" />
+                    </div>
+                  </div>
+                  <div id="filters-content" class="filters__content" hidden>
+                    <div class="filters__row">
+                      <div class="filters__field icon-input" data-icon="🎭">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                          <option value="">All categories</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="actions">
+                    <button type="submit" class="button button--gradient button--glow">Search</button>
+                    <button type="reset" class="button button--soft">Clear</button>
+                    <button type="button" id="scroll-create" class="button button--ghost" title="Create a new event">➕ Add Event</button>
+                  </div>
+                </form>
+              </div>
+            </section>
+
+            <!-- Right: Create New Event -->
+            <section id="create-panel" class="panel glass-panel" aria-labelledby="create-title">
+              <header class="panel__header">
+                <h3 id="create-title" class="panel__title panel__title--accent">Create Name</h3>
+              </header>
+              <div class="panel__body">
+                <div class="create-grid">
+                  <form id="add-form" class="stack" novalidate>
+                    <div class="float-label icon-input" data-icon="✏️">
+                      <input id="add-title-input" name="title" type="text" placeholder=" " required maxlength="200" />
+                      <label for="add-title-input">Event Name</label>
+                    </div>
+
+                    <div class="float-label autosize">
+                      <textarea id="add-description" name="description" placeholder=" " rows="3" maxlength="2000"></textarea>
+                      <label for="add-description">Description (optional)</label>
+                    </div>
+
+                    <div class="icon-input" data-icon="📍">
+                      <label for="add-location">Location</label>
+                      <input id="add-location" name="location" type="text" placeholder="City or venue" maxlength="200" />
+                    </div>
+                    <div class="switch-row">
+                      <label class="switch">
+                        <input type="checkbox" id="add-online" />
+                        <span class="switch__slider" aria-hidden="true"></span>
+                      </label>
+                      <span class="switch__label">Online event</span>
+                    </div>
+
+                    <div class="form-row-two">
+                      <div class="icon-input" data-icon="📅">
+                        <label for="add-start">Start (date &amp; time)</label>
+                        <input id="add-start" name="start" type="datetime-local" required />
+                      </div>
+                      <div class="icon-input" data-icon="📅">
+                        <label for="add-end">End (optional)</label>
+                        <input id="add-end" name="end" type="datetime-local" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label for="add-category">Category</label>
+                      <select id="add-category" name="category" required>
+                        <option value="">Select category</option>
+                      </select>
+                    </div>
+
+                    <div class="upload-zone" id="upload-zone">
+                      <input id="add-image" name="image" type="file" accept="image/*" aria-label="Upload image" />
+                      <div class="upload-zone__content">
+                        <span class="upload-zone__icon">🖼️</span>
+                        <p>Drag &amp; drop image here, or click to select</p>
+                      </div>
+                    </div>
+
+                    <div class="panel__footer">
+                      <button type="submit" class="button button--gradient button--glow">Save Event</button>
+                      <button type="button" id="cancel-create" class="button button--outline-minimal">Cancel</button>
+                    </div>
+                  </form>
+
+                  <aside class="preview-col">
+                    <div class="event-preview">
+                      <div class="event-preview__media" id="preview-media" aria-label="Preview image"></div>
+                      <div class="event-preview__content">
+                        <h3 id="preview-title">Event Title</h3>
+                        <dl class="event-card__meta">
+                          <div><dt>Date</dt><dd><time id="preview-date">TBD</time></dd></div>
+                          <div><dt>Location</dt><dd id="preview-location">—</dd></div>
+                          <div><dt>Category</dt><dd><span class="badge" id="preview-category">—</span></dd></div>
+                        </dl>
+                        <p class="event-card__desc" id="preview-desc">Description will appear here as you type.</p>
+                      </div>
+                    </div>
+                  </aside>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
 
       <!-- Results only on Events page -->
 
       <section class="events" aria-labelledby="results-title">
         <div class="events__inner container">
-          <h2 id="results-title">All Results</h2>
+          <h2 id="results-title" class="section-title">All Results</h2>
           <div class="events__grid" id="events-grid"></div>
           <nav class="pagination" id="pagination" aria-label="Pagination">
             <button class="button button--secondary" id="prev-page" disabled>Previous</button>
@@ -112,6 +185,8 @@
           </nav>
         </div>
       </section>
+      <!-- Floating Add button for quick access (scrolls to create) -->
+      <button id="fab-add" class="fab button button--gradient button--glow" title="Create a new event" aria-label="Create a new event">➕</button>
     </main>
 
     <footer class="site-footer">
@@ -151,6 +226,28 @@
         var grid = document.getElementById('events-grid');
         var searchForm = document.getElementById('search-form');
         var catSelect = document.getElementById('category');
+        var filtersToggle = document.getElementById('filters-toggle');
+        var filtersContent = document.getElementById('filters-content');
+        var fabAdd = document.getElementById('fab-add');
+        var scrollCreateBtn = document.getElementById('scroll-create');
+        var scrollCreateTop = document.getElementById('scroll-create-top');
+        var addForm = document.getElementById('add-form');
+        var isOnline = document.getElementById('add-online');
+        var addLocation = document.getElementById('add-location');
+        var addStart = document.getElementById('add-start');
+        var addEnd = document.getElementById('add-end');
+        var addCat = document.getElementById('add-category');
+        var addTitle = document.getElementById('add-title-input');
+        var addDesc = document.getElementById('add-description');
+        var addImage = document.getElementById('add-image');
+        var uploadZone = document.getElementById('upload-zone');
+        // Preview elements
+        var pTitle = document.getElementById('preview-title');
+        var pDate = document.getElementById('preview-date');
+        var pLoc = document.getElementById('preview-location');
+        var pCat = document.getElementById('preview-category');
+        var pDesc = document.getElementById('preview-desc');
+        var pMedia = document.getElementById('preview-media');
         function escapeHtml(str) { return String(str || '').replace(/[&<>\"]/g, function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]);}); }
         function cardHTML(evt) {
           var dateText = new Date(evt.date).toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'});
@@ -181,13 +278,165 @@
         var pageInfo = document.getElementById('page-info');
         function updatePagination(){ var page=Math.floor(state.offset/state.limit)+1; var pages=Math.max(1,Math.ceil(state.total/state.limit)); if(pageInfo) pageInfo.textContent = 'Page '+page+' of '+pages; if(prevBtn) prevBtn.disabled = state.offset<=0; if(nextBtn) nextBtn.disabled = state.offset+state.limit>=state.total; }
         async function runSearch(){ var p=Object.assign({}, state.params, { limit: state.limit, offset: state.offset, sort: 'date_asc' }); var r = await searchWithMeta(p); state.total=r.total; renderEvents(r.items); updatePagination(); }
-        if (searchForm){ searchForm.addEventListener('submit', async function(e){ e.preventDefault(); var fd=new FormData(searchForm); var p={}; fd.forEach((v,k)=>{ if(v) p[k]=v; }); state.params = p; state.offset=0; await runSearch(); }); }
+        if (searchForm){
+          searchForm.addEventListener('submit', async function(e){
+            e.preventDefault();
+            var fd=new FormData(searchForm);
+            var p={};
+            fd.forEach((v,k)=>{ if(v) p[k]=v; });
+            state.params = p;
+            state.offset=0;
+            await runSearch();
+          });
+          searchForm.addEventListener('reset', async function(){
+            // Allow inputs to clear before searching again
+            setTimeout(async function(){
+              state.params = {};
+              state.offset = 0;
+              await runSearch();
+            }, 0);
+          });
+        }
+        // Smooth toggle for advanced filters and scroll to create
+        if (filtersToggle && filtersContent){
+          filtersToggle.addEventListener('click', function(){
+            var open = filtersToggle.getAttribute('aria-expanded') === 'true';
+            filtersToggle.setAttribute('aria-expanded', String(!open));
+            if (open) { filtersContent.setAttribute('hidden',''); filtersContent.classList.remove('is-open'); }
+            else { filtersContent.removeAttribute('hidden'); requestAnimationFrame(function(){ filtersContent.classList.add('is-open'); }); }
+          });
+        }
+        function scrollToCreate(){ var el=document.getElementById('create-panel'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }
+        if (fabAdd) fabAdd.addEventListener('click', scrollToCreate);
+        if (scrollCreateBtn) scrollCreateBtn.addEventListener('click', scrollToCreate);
+        if (scrollCreateTop) scrollCreateTop.addEventListener('click', scrollToCreate);
+
+        if (isOnline && addLocation){
+          var syncOnline = function(){ if(isOnline.checked){ addLocation.value = 'Online'; addLocation.setAttribute('disabled',''); } else { if(addLocation.value==='Online') addLocation.value=''; addLocation.removeAttribute('disabled'); } updatePreview(); };
+          isOnline.addEventListener('change', syncOnline); syncOnline();
+        }
+
+        // Auto-resize description
+        function autoResize(el){ el.style.height='auto'; el.style.height = Math.min(320, el.scrollHeight) + 'px'; }
+        if (addDesc){ addDesc.addEventListener('input', function(){ autoResize(addDesc); updatePreview(); }); setTimeout(function(){ autoResize(addDesc); }, 0); }
+
+        // Live preview updates
+        function updatePreview(){
+          var pTitle = document.getElementById('preview-title');
+          var pDesc = document.getElementById('preview-desc');
+          var pLoc = document.getElementById('preview-location');
+          var pCat = document.getElementById('preview-category');
+          var pDate = document.getElementById('preview-date');
+          if (pTitle) pTitle.textContent = (addTitle && addTitle.value) ? addTitle.value : 'Event Title';
+          if (pDesc) pDesc.textContent = (addDesc && addDesc.value) ? addDesc.value : 'Description will appear here as you type.';
+          if (pLoc) pLoc.textContent = (isOnline && isOnline.checked) ? 'Online' : (addLocation && addLocation.value ? addLocation.value : '—');
+          if (pCat) pCat.textContent = (addCat && addCat.value) ? (addCat.options[addCat.selectedIndex].text.replace(/^\S+\s/, '')) : '—';
+          if (pDate) {
+            var s = addStart && addStart.value ? new Date(addStart.value) : null;
+            var e = addEnd && addEnd.value ? new Date(addEnd.value) : null;
+            if (s && !isNaN(s)) {
+              var opts = {year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'};
+              var txt = s.toLocaleString(undefined, opts);
+              if (e && !isNaN(e)) txt += ' – ' + e.toLocaleString(undefined, opts);
+              pDate.textContent = txt;
+            } else { pDate.textContent = 'TBD'; }
+          }
+        }
+        [addTitle, addDesc, addLocation, addStart, addEnd, addCat].forEach(function(el){ if(el) el.addEventListener('input', updatePreview); });
+
+        // Upload preview + drag and drop
+        if (document.getElementById('upload-zone') && document.getElementById('add-image')){
+          var uploadZone = document.getElementById('upload-zone');
+          var addImage = document.getElementById('add-image');
+          var pMedia = document.getElementById('preview-media');
+          function setPreview(file){
+            if (!file) { if(pMedia){ pMedia.style.backgroundImage=''; pMedia.textContent=''; } return; }
+            if (!/^image\//.test(file.type)) { alert('Please select a valid image file.'); return; }
+            var reader = new FileReader();
+            reader.onload = function(){ if(pMedia){ pMedia.style.backgroundImage = 'url(' + reader.result + ')'; pMedia.textContent=''; } };
+            reader.readAsDataURL(file);
+          }
+          uploadZone.addEventListener('dragover', function(e){ e.preventDefault(); uploadZone.classList.add('is-drag'); });
+          uploadZone.addEventListener('dragleave', function(){ uploadZone.classList.remove('is-drag'); });
+          uploadZone.addEventListener('drop', function(e){ e.preventDefault(); uploadZone.classList.remove('is-drag'); var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) { addImage.files = e.dataTransfer.files; setPreview(f); } });
+          addImage.addEventListener('change', function(){ var f = addImage.files && addImage.files[0]; setPreview(f); });
+        }
+
+        if (addForm){
+          addForm.addEventListener('submit', async function(e){
+            e.preventDefault();
+            // Basic client-side validation
+            var title = (addTitle && addTitle.value.trim()) || '';
+            var locationVal = (isOnline && isOnline.checked) ? 'Online' : ((addLocation && addLocation.value.trim()) || '');
+            var startVal = addStart && addStart.value ? addStart.value : '';
+            var categoryVal = addCat && addCat.value ? addCat.value : '';
+
+            if (!title) { alert('Event name is required.'); addTitle && addTitle.focus(); return; }
+            if (!startVal) { alert('Start date/time is required.'); addStart && addStart.focus(); return; }
+            if (!locationVal) { alert('Location is required (or mark as Online).'); addLocation && addLocation.focus(); return; }
+            if (!categoryVal) { alert('Please select a category.'); addCat && addCat.focus(); return; }
+
+            // Map to API schema (date only; strip time)
+            var dateOnly = new Date(startVal);
+            if (isNaN(dateOnly)) { alert('Invalid date.'); addStart && addStart.focus(); return; }
+            var yyyy = dateOnly.getFullYear();
+            var mm = String(dateOnly.getMonth()+1).padStart(2,'0');
+            var dd = String(dateOnly.getDate()).padStart(2,'0');
+            var payload = {
+              title: title,
+              description: (addDesc && addDesc.value) || null,
+              location: locationVal,
+              category: categoryVal,
+              date: yyyy + '-' + mm + '-' + dd
+            };
+            try {
+              var res = await fetch(API_BASE + '/events/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+              if (res.status === 201) {
+                // Clear minimal fields for next use
+                addForm.reset();
+                state.offset = 0; await runSearch();
+                updatePreview();
+              } else {
+                var txt = await res.text();
+                alert('Failed to save event: ' + txt);
+              }
+            } catch (err) {
+              console.error(err);
+              alert('Could not reach the API. Is it running on port 8001?');
+            }
+          });
+          var cancelBtn = document.getElementById('cancel-create');
+          if (cancelBtn){
+            cancelBtn.addEventListener('click', function(){ addForm.reset(); updatePreview(); });
+          }
+        }
+        // No advanced filters panel in simplified UI
         if (prevBtn) prevBtn.addEventListener('click', async function(){ if(state.offset>0){ state.offset=Math.max(0,state.offset-state.limit); await runSearch(); window.scrollTo({top:0,behavior:'smooth'}); } });
         if (nextBtn) nextBtn.addEventListener('click', async function(){ if(state.offset+state.limit<state.total){ state.offset += state.limit; await runSearch(); window.scrollTo({top:0,behavior:'smooth'}); } });
         // Initial load
         (async function(){ try{ await runSearch(); } catch(_){} })();
         // Populate categories dynamically
-        (async function(){ try{ if(!catSelect) return; var res = await fetch(API_BASE + '/meta/categories'); if(!res.ok) return; var cats = await res.json(); var first = catSelect.querySelector('option'); catSelect.innerHTML=''; if(first) catSelect.appendChild(first); cats.forEach(function(c){ var o=document.createElement('option'); o.value=c; o.textContent=c.charAt(0).toUpperCase()+c.slice(1); catSelect.appendChild(o); }); } catch(_){} })();
+        (async function(){
+          try{
+            if(!catSelect && !addCat) return;
+            var res = await fetch(API_BASE + '/meta/categories');
+            if(!res.ok) return;
+            var cats = await res.json();
+            var icons = { music:'🎵', tech:'💻', arts:'🎨', sports:'⚽', business:'💼', community:'👥' };
+            if (catSelect){
+              var first = catSelect.querySelector('option');
+              catSelect.innerHTML='';
+              if(first) catSelect.appendChild(first);
+              cats.forEach(function(c){ var o=document.createElement('option'); o.value=c; var label=c.charAt(0).toUpperCase()+c.slice(1); o.textContent=(icons[c] ? icons[c]+' ' : '') + label; catSelect.appendChild(o); });
+            }
+            if (addCat){
+              var first2 = addCat.querySelector('option');
+              addCat.innerHTML='';
+              if(first2) addCat.appendChild(first2);
+              cats.forEach(function(c){ var o2=document.createElement('option'); o2.value=c; var label2=c.charAt(0).toUpperCase()+c.slice(1); o2.textContent=(icons[c] ? icons[c]+' ' : '') + label2; addCat.appendChild(o2); });
+            }
+          } catch(_){}
+        })();
 
         // (Location APIs removed by request: Google Maps/Places and Geolocation)
       })();

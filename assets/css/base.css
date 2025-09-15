@@ -38,4 +38,6 @@
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .container { max-width: 1120px; margin-inline: auto; padding-inline: clamp(1rem, 3vw, 2rem); }
+  /* a11y utility */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 }
