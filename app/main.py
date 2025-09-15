@@ -11,7 +11,7 @@ import sqlite3
 from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import settings
-from .core.database import init_db
+from .core.database import get_db, init_db
 from .api.routes import events as events_router
 from .api.routes import meta as meta_router
 
