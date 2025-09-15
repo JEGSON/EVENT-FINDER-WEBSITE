@@ -22,7 +22,9 @@ COPY about.html ./
 
 # Add entrypoint script
 COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh && useradd -m appuser
+RUN chmod +x /entrypoint.sh && useradd -m appuser \
+    && mkdir -p /data \
+    && chown -R appuser:appuser /data
 
 VOLUME ["/data"]
 
@@ -31,4 +33,3 @@ EXPOSE 8000 8001
 USER appuser
 
 ENTRYPOINT ["/entrypoint.sh"]
-

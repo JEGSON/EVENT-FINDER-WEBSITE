@@ -12,11 +12,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
 
-VOLUME ["/data"]
+# Ensure database directory exists and is writable by runtime user (nobody:65534)
+RUN mkdir -p /data \
+    && chown -R 65534:65534 /data
 
 EXPOSE 8001
 
 USER nobody
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "10000"]
-
+# Use platform-provided PORT when available (e.g., Render)
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8001}"]
