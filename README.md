@@ -2,6 +2,36 @@
 
 A simple, scalable Event Finder with a FastAPI backend and a static HTML/CSS/JS frontend.
 
+## Live Demo
+
+- Frontend on Render: <https://event-finder-website.onrender.com/index.html>
+
+## Screenshots (Render)
+
+<!-- Add your screenshots to docs/screenshots and they will render here. -->
+
+<p align="center">
+  <img src="docs/screenshots/render-backend.png" alt="Render backend deployment (logs)" width="900" />
+</p>
+
+<p align="center">
+  <a href="https://event-finder-website.onrender.com/index.html">
+    <img src="docs/screenshots/render-frontend.png" alt="Frontend running on Render" width="900" />
+  </a>
+</p>
+
+To update these images:
+
+```bash
+mkdir -p docs/screenshots
+# Save your images to the paths below
+# - docs/screenshots/render-backend.png
+# - docs/screenshots/render-frontend.png
+git add docs/screenshots/*.png
+git commit -m "docs: add Render screenshots"
+git push origin main
+```
+
 ## Features
 
 - Add events (title, description, location, category, date)
