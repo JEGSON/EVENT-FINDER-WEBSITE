@@ -5,8 +5,9 @@ Use ``uvicorn app.main:app --reload --port 8001`` to run the API locally.
 """
 
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import RedirectResponse, JSONResponse
+import sqlite3
 from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import settings
@@ -43,6 +44,22 @@ def create_app() -> FastAPI:
     def health() -> dict:
         """Simple liveness endpoint used by monitors and tests."""
         return {"status": "ok"}
+
+    @app.get("/ready")
+    def ready(conn: sqlite3.Connection = Depends(get_db)) -> dict:
+        """Readiness probe that verifies the app can talk to SQLite.
+
+        Returns 200 with status ok when a trivial DB query succeeds; 503 otherwise.
+        Suitable for container orchestrator health checks (e.g., Render).
+        """
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT 1")
+            _ = cur.fetchone()
+            return {"status": "ok", "db": "ok"}
+        except Exception:
+            # Avoid leaking internals in readiness path
+            raise HTTPException(status_code=503, detail="unready")
 
     @app.get("/", include_in_schema=False)
     def root() -> RedirectResponse:
