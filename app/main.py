@@ -44,6 +44,10 @@ def create_app() -> FastAPI:
     def health() -> dict:
         """Simple liveness endpoint used by monitors and tests."""
         return {"status": "ok"}
+    
+    @app.head("/health")
+    def health_head() -> JSONResponse:
+        return JSONResponse(status_code=200, content=None)
 
     @app.get("/ready")
     def ready(conn: sqlite3.Connection = Depends(get_db)) -> dict:

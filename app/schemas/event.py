@@ -84,6 +84,19 @@ class EventQuery(BaseModel):
     limit: int = Field(20, ge=1, le=100)
     offset: int = Field(0, ge=0)
     sort: SortEnum = SortEnum.date_asc
+    # Optional first-letter title filter used by the API route; keep it here for
+    # proper validation and to avoid type: ignore in the router.
+    starts_with: Optional[str] = Field(None, description="Filter by first letter of title (A–Z)")
+
+    @field_validator("starts_with")
+    @classmethod
+    def _validate_starts_with(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        v = v.strip()
+        if len(v) != 1 or not v.isalpha():
+            raise ValueError("starts_with must be a single alphabetic character")
+        return v
 
 
 class EventUpdate(BaseModel):

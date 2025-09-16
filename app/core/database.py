@@ -20,9 +20,23 @@ DB_PATH = Path(settings.database_path)
 
 
 def _connect() -> sqlite3.Connection:
-    """Create a SQLite connection with row factory configured."""
+    """Create a SQLite connection with sensible defaults for web apps.
+
+    - ``row_factory`` returns dict-like rows
+    - ``busy_timeout`` prevents immediate "database is locked" errors
+    - ``journal_mode=WAL`` improves concurrent readers
+    - ``synchronous=NORMAL`` balances durability/perf for web traffic
+    """
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    try:
+        conn.execute("PRAGMA busy_timeout=5000")
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+    except sqlite3.Error:
+        # Pragmas are best-effort and platform dependent; ignore failures
+        pass
     return conn
 
 

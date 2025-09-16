@@ -10,27 +10,27 @@ A simple, scalable Event Finder with a FastAPI backend and a static HTML/CSS/JS 
 
 <!-- Add your screenshots to docs/screenshots and they will render here. -->
 
-<p align="center">
-  <img src="docs/screenshots/render-backend.png" alt="Render backend deployment (logs)" width="900" />
-</p>
+     <p align="center">
+      <img src="docs/screenshots/render-backend.png" alt="Render backend deployment (logs)" width="900" />
+     </p>
 
-<p align="center">
-  <a href="https://event-finder-website.onrender.com/index.html">
-    <img src="docs/screenshots/render-frontend.png" alt="Frontend running on Render" width="900" />
-  </a>
-</p>
+     <p align="center">
+       <a href="https://event-finder-website.onrender.com/index.html">
+       <img src="docs/screenshots/render-frontend.png" alt="Frontend running on Render" width="900" />
+       </a>
+     </p>
 
 To update these images:
 
-```bash
-mkdir -p docs/screenshots
-# Save your images to the paths below
-# - docs/screenshots/render-backend.png
-# - docs/screenshots/render-frontend.png
+      ```bash
+          mkdir -p docs/screenshots
+         # Save your images to the paths below
+         # - docs/screenshots/render-backend.png
+         # - docs/screenshots/render-frontend.png
 git add docs/screenshots/*.png
 git commit -m "docs: add Render screenshots"
 git push origin main
-```
+       ```
 
 ## Features
 
@@ -44,18 +44,18 @@ git push origin main
 
 Backend (port 8001):
 
-```bash
+     ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --host 127.0.0.1 --port 8001 --reload
-```
+    ```
 
 Frontend (port 8000):
 
-```bash
+     ```bash
 python3 -m http.server 8000
-```
+    ```
 
 Open [http://localhost:8000/](http://localhost:8000/)
 
@@ -74,9 +74,9 @@ The search response includes `X-Total-Count` header.
 
 With the backend virtualenv active:
 
-```bash
-python scripts/seed.py
-```
+    ```bash
+       python scripts/seed.py
+    ```
 
 ## Architecture
 
