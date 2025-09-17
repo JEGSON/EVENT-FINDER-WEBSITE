@@ -92,6 +92,10 @@ With the backend virtualenv active:
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/API.md](docs/API.md) for details.
 
+## Deployment
+
+Terraform now manages the AWS infrastructure that hosts Event Finder. The static site and FastAPI backend were migrated off Render into the AWS environment defined under `infra/`; see [docs/AWS_DEPLOYMENT.md](docs/AWS_DEPLOYMENT.md) for the end-to-end workflow.
+
 ## Configuration
 
 Environment variables (prefix `EVENTFINDER_`):
