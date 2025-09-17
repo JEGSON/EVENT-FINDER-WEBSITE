@@ -1,16 +1,23 @@
-from __future__ import annotations
-
 """Data access layer for events.
 
 Contains thin, well-typed helpers that translate between SQLite rows and
 Pydantic models and construct SQL for filtering, sorting, and pagination.
 """
 
-from typing import Any, Dict, Iterable, List, Optional
+from __future__ import annotations
+
 import re
 import sqlite3
+from typing import Any, List, Optional
 
-from ..schemas.event import EventCreate, EventOut, EventQuery, EventUpdate, SortEnum
+from ..schemas.event import (
+    EventCreate,
+    EventOut,
+    EventQuery,
+    EventUpdate,
+    SortEnum,
+    CategoryEnum,
+)
 
 
 def _fts_available(conn: sqlite3.Connection) -> bool:
@@ -85,9 +92,11 @@ def list_events(conn: sqlite3.Connection, q: EventQuery) -> List[EventOut]:
             clauses.append("(title LIKE ? OR description LIKE ?)")
             like = f"%{q.q}%"
             params.extend([like, like])
-    if getattr(q, 'starts_with', None):
-        clauses.append("LOWER(title) LIKE ?")
-        params.append(f"{q.starts_with.lower()}%") # type: ignore
+    if getattr(q, "starts_with", None):
+        prefix = q.starts_with
+        if prefix is not None:
+            clauses.append("LOWER(title) LIKE ?")
+            params.append(f"{prefix.lower()}%")
     if q.location:
         clauses.append("LOWER(location) LIKE ?")
         params.append(f"%{q.location.lower()}%")
@@ -137,9 +146,11 @@ def count_events(conn: sqlite3.Connection, q: EventQuery) -> int:
             clauses.append("(title LIKE ? OR description LIKE ?)")
             like = f"%{q.q}%"
             params.extend([like, like])
-    if getattr(q, 'starts_with', None):
-        clauses.append("LOWER(title) LIKE ?")
-        params.append(f"{q.starts_with.lower()}%") # type: ignore
+    if getattr(q, "starts_with", None):
+        prefix = q.starts_with
+        if prefix is not None:
+            clauses.append("LOWER(title) LIKE ?")
+            params.append(f"{prefix.lower()}%")
     if q.location:
         clauses.append("LOWER(location) LIKE ?")
         params.append(f"%{q.location.lower()}%")
@@ -178,7 +189,6 @@ def update_event(conn: sqlite3.Connection, event_id: int, updates: EventUpdate) 
     data = updates.model_dump(exclude_unset=True)
     if not data:
         return get_event(conn, event_id)
-    
     fields = []
     params: List[Any] = []
     if "title" in data:
@@ -192,7 +202,11 @@ def update_event(conn: sqlite3.Connection, event_id: int, updates: EventUpdate) 
         params.append(data["location"])
     if "category" in data:
         fields.append("category = ?")
-        params.append(data["category"].value if hasattr(data["category"], 'value') else data["category"])  # type: ignore
+        category = data["category"]
+        if isinstance(category, CategoryEnum):
+            params.append(category.value)
+        else:
+            params.append(str(category))
     if "date" in data:
         fields.append("date = ?")
         params.append(data["date"].isoformat())

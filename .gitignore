@@ -9,3 +9,10 @@ __pycache__/
 
 # Environment files
 .env
+
+# Terraform local state and artifacts
+.terraform/
+**/.terraform/*
+terraform.tfstate
+terraform.tfstate.*
+.terraform.lock.hcl

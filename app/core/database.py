@@ -188,7 +188,7 @@ def init_db() -> None:
         except Exception:
             # If we cannot rename, fall back to removing the corrupted file
             try:
-                DB_PATH.unlink(missing_ok=True)  # type: ignore[attr-defined]
+                DB_PATH.unlink(missing_ok=True)
             except Exception:
                 pass
         with _connect() as conn:

@@ -1,8 +1,16 @@
 import importlib
 import os
+import sys
+import warnings
 from pathlib import Path
 
-import pytest # type: ignore
+import pytest
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 @pytest.fixture(scope="session")
@@ -26,4 +34,3 @@ def app(test_db_path: Path):
     from app import main as main_module
     importlib.reload(main_module)
     return main_module.create_app()
-

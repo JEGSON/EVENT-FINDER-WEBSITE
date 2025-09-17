@@ -1,0 +1,74 @@
+name: terraform-ec2
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: plan or apply
+        required: true
+        default: plan
+        type: choice
+        options: [plan, apply]
+
+jobs:
+  tf:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/terraform
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      # Configure AWS credentials (OIDC) or fall back to secrets
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+        if: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN != '' }}
+
+      - name: Configure AWS credentials (access keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+        if: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN == '' }}
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: ${{ github.event.inputs.action == 'plan' }}
+        run: |
+          terraform plan -input=false \
+            -var "project_name=${{ vars.PROJECT_NAME || 'event-finder' }}" \
+            -var "aws_region=${{ vars.AWS_REGION || 'us-east-1' }}" \
+            -var "api_image=${{ vars.API_IMAGE }}" \
+            -var "web_image=${{ vars.WEB_IMAGE }}"
+
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: |
+          terraform apply -auto-approve -input=false \
+            -var "project_name=${{ vars.PROJECT_NAME || 'event-finder' }}" \
+            -var "aws_region=${{ vars.AWS_REGION || 'us-east-1' }}" \
+            -var "api_image=${{ vars.API_IMAGE }}" \
+            -var "web_image=${{ vars.WEB_IMAGE }}"
+

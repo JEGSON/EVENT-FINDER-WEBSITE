@@ -5,15 +5,26 @@ Use ``uvicorn app.main:app --reload --port 8001`` to run the API locally.
 """
 
 import logging
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import RedirectResponse, JSONResponse
+from contextlib import asynccontextmanager
 import sqlite3
+from typing import AsyncIterator
+
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from .core.config import settings
 from .core.database import get_db, init_db
 from .api.routes import events as events_router
 from .api.routes import meta as meta_router
+
+
+@asynccontextmanager
+async def _lifespan(_: FastAPI) -> AsyncIterator[None]:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    init_db()
+    logging.getLogger(__name__).info("DB initialized and ready")
+    yield
 
 
 def create_app() -> FastAPI:
@@ -22,7 +33,7 @@ def create_app() -> FastAPI:
     Returns:
         FastAPI: A configured FastAPI instance with CORS, routes, and startup.
     """
-    app = FastAPI(title=settings.app_name)
+    app = FastAPI(title=settings.app_name, lifespan=_lifespan)
 
     app.add_middleware(
         CORSMiddleware,
@@ -32,13 +43,6 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
         expose_headers=["X-Total-Count"],
     )
-
-    @app.on_event("startup")
-    def _startup() -> None:
-        """Initialize local SQLite database and indexes on startup."""
-        logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
-        init_db()
-        logging.getLogger(__name__).info("DB initialized and ready")
 
     @app.get("/health")
     def health() -> dict:

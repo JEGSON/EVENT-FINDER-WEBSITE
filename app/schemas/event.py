@@ -4,10 +4,13 @@ These schemas define request/response models and search parameters, and provide
 validators to normalize and sanitize common fields.
 """
 
-from datetime import date
-from typing import Optional
+from __future__ import annotations
+
+import datetime as dt
 from enum import Enum
-from pydantic import BaseModel, Field, field_validator
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class CategoryEnum(str, Enum):
@@ -30,7 +33,7 @@ class EventBase(BaseModel):
     description: Optional[str] = Field(None, max_length=2000)
     location: str = Field(..., max_length=200)
     category: CategoryEnum
-    date: date
+    date: dt.date
 
     @field_validator("title", "location", "description", mode="before")
     @classmethod
@@ -59,11 +62,11 @@ class EventCreate(EventBase):
 
 class EventOut(EventBase):
     """Event payload returned by the API."""
+
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     created_at: str
-
-    class Config:
-        from_attributes = True
 
 
 class SortEnum(str, Enum):
@@ -77,15 +80,15 @@ class EventQuery(BaseModel):
     """Search and pagination options for listing events."""
     q: Optional[str] = None
     location: Optional[str] = None
-    date: Optional[date] = None # type: ignore
+    date: Optional[dt.date] = None
     category: Optional[CategoryEnum] = None
-    start_date: Optional[date] = None # type: ignore
-    end_date: Optional[date] = None # type: ignore
+    start_date: Optional[dt.date] = None
+    end_date: Optional[dt.date] = None
     limit: int = Field(20, ge=1, le=100)
     offset: int = Field(0, ge=0)
     sort: SortEnum = SortEnum.date_asc
-    # Optional first-letter title filter used by the API route; keep it here for
-    # proper validation and to avoid type: ignore in the router.
+    # Optional first-letter title filter used by the API route; validates here to keep
+    # the router lean and avoid ad-hoc checks.
     starts_with: Optional[str] = Field(None, description="Filter by first letter of title (A–Z)")
 
     @field_validator("starts_with")
@@ -105,7 +108,7 @@ class EventUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=2000)
     location: Optional[str] = Field(None, max_length=200)
     category: Optional[CategoryEnum] = None
-    date: Optional[date] = None # type: ignore
+    date: Optional[dt.date] = None
 
     @field_validator("title", "location", "description", mode="before")
     @classmethod

@@ -1,123 +1,122 @@
+from __future__ import annotations
+
+from contextlib import asynccontextmanager
 from datetime import date
 
 import pytest
-import httpx
+import pytest_asyncio
 from fastapi import FastAPI
+from httpx import ASGITransport, AsyncClient
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with app.router.lifespan_context(app):
+        yield
+
+
+@pytest_asyncio.fixture
+async def client(app: FastAPI):
+    async with lifespan(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as async_client:
+            yield async_client
 
 
 @pytest.mark.asyncio
-async def test_health(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        r = await client.get("/health")
-        assert r.status_code == 200
-        assert r.json() == {"status": "ok"}
+async def test_health(client: AsyncClient) -> None:
+    response = await client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
 
 
 @pytest.mark.asyncio
-async def test_categories(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        r = await client.get("/api/meta/categories")
-        assert r.status_code == 200
-        cats = r.json()
-        assert isinstance(cats, list) and "music" in cats
+async def test_categories(client: AsyncClient) -> None:
+    response = await client.get("/api/meta/categories")
+    assert response.status_code == 200
+    categories = response.json()
+    assert isinstance(categories, list) and "music" in categories
 
 
 @pytest.mark.asyncio
-async def test_create_get_and_list_event(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        payload = {
-            "title": "PyCon Meetup",
-            "description": "A great Python event",
-            "location": "Online",
-            "category": "tech",
-            "date": date.today().isoformat(),
-        }
+async def test_create_get_and_list_event(client: AsyncClient) -> None:
+    payload = {
+        "title": "PyCon Meetup",
+        "description": "A great Python event",
+        "location": "Online",
+        "category": "tech",
+        "date": date.today().isoformat(),
+    }
 
-        # Create
-        r = await client.post("/api/events/", json=payload)
-        assert r.status_code == 201
-        created = r.json()
-        assert created["id"] > 0
-        assert created["title"] == payload["title"]
+    create_response = await client.post("/api/events/", json=payload)
+    assert create_response.status_code == 201
+    created = create_response.json()
+    assert created["id"] > 0
+    assert created["title"] == payload["title"]
 
-        # Get by id
-        r = await client.get(f"/api/events/{created['id']}")
-        assert r.status_code == 200
-        fetched = r.json()
-        assert fetched["id"] == created["id"]
+    detail_response = await client.get(f"/api/events/{created['id']}")
+    assert detail_response.status_code == 200
+    fetched = detail_response.json()
+    assert fetched["id"] == created["id"]
 
-        # List/search
-        r = await client.get("/api/events/?limit=10&offset=0")
-        assert r.status_code == 200
-        assert "X-Total-Count" in r.headers
-        items = r.json()
-        assert any(evt["id"] == created["id"] for evt in items)
+    list_response = await client.get("/api/events/?limit=10&offset=0")
+    assert list_response.status_code == 200
+    assert "X-Total-Count" in list_response.headers
+    items = list_response.json()
+    assert any(evt["id"] == created["id"] for evt in items)
 
 
 @pytest.mark.asyncio
-async def test_update_event_partial(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        # Seed an event
-        payload = {
-            "title": "Original Title",
-            "description": "desc",
-            "location": "Lagos",
-            "category": "tech",
-            "date": date.today().isoformat(),
-        }
-        r = await client.post("/api/events/", json=payload)
-        assert r.status_code == 201
-        evt = r.json()
+async def test_update_event_partial(client: AsyncClient) -> None:
+    payload = {
+        "title": "Original Title",
+        "description": "desc",
+        "location": "Lagos",
+        "category": "tech",
+        "date": date.today().isoformat(),
+    }
+    create_response = await client.post("/api/events/", json=payload)
+    assert create_response.status_code == 201
+    created = create_response.json()
 
-        # Partial update: title trim + category normalization
-        patch = {"title": "  Updated Title  ", "category": "MUSIC"}
-        r = await client.patch(f"/api/events/{evt['id']}", json=patch)
-        assert r.status_code == 200
-        updated = r.json()
-        assert updated["title"] == "Updated Title"
-        assert updated["category"] == "music"
+    patch = {"title": "  Updated Title  ", "category": "MUSIC"}
+    update_response = await client.patch(f"/api/events/{created['id']}", json=patch)
+    assert update_response.status_code == 200
+    updated = update_response.json()
+    assert updated["title"] == "Updated Title"
+    assert updated["category"] == "music"
 
-        # Fetch again to ensure persisted
-        r = await client.get(f"/api/events/{evt['id']}")
-        assert r.status_code == 200
-        fetched = r.json()
-        assert fetched["title"] == "Updated Title"
-        assert fetched["category"] == "music"
+    detail_response = await client.get(f"/api/events/{created['id']}")
+    assert detail_response.status_code == 200
+    fetched = detail_response.json()
+    assert fetched["title"] == "Updated Title"
+    assert fetched["category"] == "music"
 
 
 @pytest.mark.asyncio
-async def test_delete_event_and_404_after(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        payload = {
-            "title": "To Delete",
-            "description": None,
-            "location": "Remote",
-            "category": "community",
-            "date": date.today().isoformat(),
-        }
-        r = await client.post("/api/events/", json=payload)
-        assert r.status_code == 201
-        evt = r.json()
+async def test_delete_event_and_404_after(client: AsyncClient) -> None:
+    payload = {
+        "title": "To Delete",
+        "description": None,
+        "location": "Remote",
+        "category": "community",
+        "date": date.today().isoformat(),
+    }
+    create_response = await client.post("/api/events/", json=payload)
+    assert create_response.status_code == 201
+    created = create_response.json()
 
-        # Delete the event
-        r = await client.delete(f"/api/events/{evt['id']}")
-        assert r.status_code == 204
+    delete_response = await client.delete(f"/api/events/{created['id']}")
+    assert delete_response.status_code == 204
 
-        # Subsequent GET should be 404
-        r = await client.get(f"/api/events/{evt['id']}")
-        assert r.status_code == 404
+    detail_response = await client.get(f"/api/events/{created['id']}")
+    assert detail_response.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_update_delete_nonexistent_return_404(app: FastAPI):
-    transport = httpx.ASGITransport(app=app, lifespan="on") # type: ignore
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        r = await client.patch("/api/events/999999", json={"title": "Nope"})
-        assert r.status_code == 404
-        r = await client.delete("/api/events/999999")
-        assert r.status_code == 404
+async def test_update_delete_nonexistent_return_404(client: AsyncClient) -> None:
+    patch_response = await client.patch("/api/events/999999", json={"title": "Nope"})
+    assert patch_response.status_code == 404
+
+    delete_response = await client.delete("/api/events/999999")
+    assert delete_response.status_code == 404

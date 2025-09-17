@@ -5,13 +5,35 @@ support keyword search, location and category filters, date range filtering,
 sorting, pagination, and a total-count response header.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
-from typing import List, Optional
+from datetime import date as _date
 import sqlite3
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from ...core.database import get_db
-from ...schemas.event import EventCreate, EventOut, EventQuery, CategoryEnum, SortEnum, EventUpdate
-from ...repositories.events import insert_event, list_events, get_event, count_events, update_event, delete_event
+from ...repositories.events import (
+    count_events,
+    delete_event,
+    get_event,
+    insert_event,
+    list_events,
+    update_event,
+)
+from ...schemas.event import (
+    CategoryEnum,
+    EventCreate,
+    EventOut,
+    EventQuery,
+    EventUpdate,
+    SortEnum,
+)
+
+
+def _parse_iso_date(value: Optional[str]) -> Optional[_date]:
+    if value is None:
+        return None
+    return _date.fromisoformat(value)
 
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -52,12 +74,12 @@ def search_events(
     """
     parsed = EventQuery(
         q=q,
-        starts_with=starts_with, # type: ignore
+        starts_with=starts_with,
         location=location,
-        date=date,  # pydantic will parse to date in EventQuery
+        date=_parse_iso_date(date),
         category=category,
-        start_date=start_date,
-        end_date=end_date,
+        start_date=_parse_iso_date(start_date),
+        end_date=_parse_iso_date(end_date),
         limit=limit,
         offset=offset,
         sort=sort,
